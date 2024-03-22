@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkcatapult_docs=self.webpackChunkcatapult_docs||[]).push([[3927],{2429:a=>{a.exports=JSON.parse('{"label":"hola","permalink":"/catapult/blog/tags/hola","allTagsPath":"/catapult/blog/tags","count":1,"unlisted":false}')}}]);
