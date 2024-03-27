@@ -9,18 +9,18 @@ import { themes as prismThemes } from 'prism-react-renderer';
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Catapult Docs',
-  tagline: 'Dinosaurs are cool',
+  tagline: 'Hardware and Software Info',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
   url: 'https://rayyan06.github.io/',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/catapult/',
+  baseUrl: '/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'catapult.github.io', // Usually your GitHub org/user name.
+  organizationName: 'Rayyan06', // Usually your GitHub org/user name.
   projectName: 'Catapult', // Usually your repo name.
 
   onBrokenLinks: 'throw',
@@ -66,11 +66,12 @@ const config = {
       // Replace with your project's social card
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
-        title: 'My Site',
+        title: 'Catapult',
+        /*
         logo: {
           alt: 'My Site Logo',
           src: 'img/logo.svg',
-        },
+        },*/
         items: [
           {
             type: 'docSidebar',
@@ -78,9 +79,16 @@ const config = {
             position: 'left',
             label: 'Tutorial',
           },
+          /*
+          {
+            type: 'docSidebar',
+            sidebarId: 'avrSidebar',
+            position: 'left',
+            label: 'AVR Programming',
+          },*/
           { to: '/blog', label: 'Blog', position: 'left' },
           {
-            href: 'https://github.com/facebook/docusaurus',
+            href: 'https://github.com/Rayyan06/AVR-Programming',
             label: 'GitHub',
             position: 'right',
           },
@@ -90,17 +98,18 @@ const config = {
         style: 'dark',
         links: [
           {
-            title: 'Docs',
+            title: 'Catapult Docs',
             items: [
               {
                 label: 'Tutorial',
                 to: '/docs/intro',
               },
             ],
-          },
+          } /*
           {
             title: 'Community',
             items: [
+             
               {
                 label: 'Stack Overflow',
                 href: 'https://stackoverflow.com/questions/tagged/docusaurus',
@@ -114,7 +123,7 @@ const config = {
                 href: 'https://twitter.com/docusaurus',
               },
             ],
-          },
+          },*/,
           {
             title: 'More',
             items: [
@@ -124,12 +133,12 @@ const config = {
               },
               {
                 label: 'GitHub',
-                href: 'https://github.com/facebook/docusaurus',
+                href: 'https://github.com/Rayyan06/AVR-Programming',
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Catapult Project`,
       },
       prism: {
         theme: prismThemes.github,
