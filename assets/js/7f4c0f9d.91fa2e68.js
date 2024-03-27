@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkcatapult_docs=self.webpackChunkcatapult_docs||[]).push([[8410],{2907:a=>{a.exports=JSON.parse('{"label":"facebook","permalink":"/catapult/blog/tags/facebook","allTagsPath":"/catapult/blog/tags","count":1,"unlisted":false}')}}]);

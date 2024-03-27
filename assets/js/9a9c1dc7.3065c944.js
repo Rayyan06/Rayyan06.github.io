@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkcatapult_docs=self.webpackChunkcatapult_docs||[]).push([[7064],{2003:t=>{t.exports=JSON.parse('{"permalink":"/catapult/blog/tags/hello","page":1,"postsPerPage":10,"totalPages":1,"totalCount":2,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);
