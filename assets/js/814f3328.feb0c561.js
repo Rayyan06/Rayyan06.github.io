@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkcatapult_docs=self.webpackChunkcatapult_docs||[]).push([[472],{5513:e=>{e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Welcome!","permalink":"/blog/hello, world!","unlisted":false}]}')}}]);
