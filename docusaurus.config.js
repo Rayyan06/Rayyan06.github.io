@@ -22,7 +22,7 @@ const config = {
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'Rayyan06', // Usually your GitHub org/user name.
   projectName: 'Catapult', // Usually your repo name.
-
+  trailingSlash: false,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
 
@@ -44,14 +44,14 @@ const config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://github.com/Rayyan06/Catapult/tree/main/packages/create-docusaurus/templates/shared/',
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://github.com/Rayyan06/Catapult/tree/main/packages/create-docusaurus/templates/shared/',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -75,17 +75,10 @@ const config = {
         items: [
           {
             type: 'docSidebar',
-            sidebarId: 'tutorialSidebar',
-            position: 'left',
-            label: 'Tutorial',
-          },
-          /*
-          {
-            type: 'docSidebar',
             sidebarId: 'avrSidebar',
             position: 'left',
             label: 'AVR Programming',
-          },*/
+          },
           { to: '/blog', label: 'Blog', position: 'left' },
           {
             href: 'https://github.com/Rayyan06/AVR-Programming',
@@ -101,8 +94,8 @@ const config = {
             title: 'Catapult Docs',
             items: [
               {
-                label: 'Tutorial',
-                to: '/docs/intro',
+                label: 'AVR Programming',
+                to: '/docs/avr-programming/overview',
               },
             ],
           } /*
