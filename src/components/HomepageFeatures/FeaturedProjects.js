@@ -6,14 +6,14 @@ import ProjectCard from './ProjectCard';
 const projects = [
   {
     title: 'DIY Hot-Wire Foam Cutting CNC',
-    imageUrl: '/img/foam-cutter-cnc.jpg', // Make sure this path is correct!
+    imageUrl: 'https://placehold.co/600x400', // Make sure this path is correct!
     description:
       'A 4-axis CNC machine built from scratch to cut intricate wing airfoils and fuselage sections out of foam for RC planes.',
     linkUrl: '/projects/foam-cutter-cnc',
   },
   {
     title: '3D Printed Optical Encoder',
-    imageUrl: '/img/optical-encoder.jpg', // Make sure this path is correct!
+    imageUrl: 'https://placehold.co/600x400', // Make sure this path is correct!
     description:
       'A high-resolution optical encoder using 3D printed parts and an AVR microcontroller to get precise feedback on shaft position and speed.',
     linkUrl: '/projects/optical-encoder',
