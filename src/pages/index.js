@@ -6,6 +6,7 @@ import HomepageFeatures from '@site/src/components/HomepageFeatures';
 
 import Heading from '@theme/Heading';
 import styles from './index.module.css';
+import FeaturedProjects from '../components/HomepageFeatures/FeaturedProjects';
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
@@ -17,8 +18,8 @@ function HomepageHeader() {
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <div className={styles.buttons}>
-          <Link className="button button--secondary button--lg" to="#">
-            AVR Programming
+          <Link className="button button--secondary button--lg" to="/projects">
+            My Projects
           </Link>
         </div>
       </div>
@@ -35,7 +36,7 @@ export default function Home() {
     >
       <HomepageHeader />
       <main>
-        <HomepageFeatures />
+        <FeaturedProjects />
       </main>
     </Layout>
   );

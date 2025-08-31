@@ -1,0 +1,8 @@
+{
+  "label": "All Projects",
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "description": "A collection of my finished electronics and hardware projects. Each page details the build process, challenges, and final results."
+  }
+}
