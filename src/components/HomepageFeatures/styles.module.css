@@ -9,3 +9,53 @@
   height: 200px;
   width: 200px;
 }
+
+/* src/components/ProjectCard.module.css */
+.projectCard {
+  display: block;
+  border-radius: var(--ifm-card-border-radius);
+  background-color: var(--ifm-card-background-color);
+  box-shadow: var(--ifm-card-box-shadow);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  color: inherit;
+  text-decoration: none;
+  overflow: hidden;
+}
+
+.projectCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  color: inherit;
+  text-decoration: none;
+}
+
+.cardImageContainer {
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+  position: relative;
+}
+
+.cardImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardContent {
+  padding: var(--ifm-card-padding-vertical) var(--ifm-card-padding-horizontal);
+}
+
+.cardContent h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+  color: var(--ifm-color-primary);
+}
+
+.cardContent p {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+  color: var(--ifm-font-color-secondary);
+}

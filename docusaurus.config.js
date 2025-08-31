@@ -8,7 +8,7 @@ import { themes as prismThemes } from 'prism-react-renderer';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Catapult Docs',
+  title: 'Portfolio',
   tagline: 'Hardware and Software Info',
   favicon: 'img/favicon.ico',
 
@@ -21,7 +21,7 @@ const config = {
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'Rayyan06', // Usually your GitHub org/user name.
-  projectName: 'Catapult', // Usually your repo name.
+  projectName: 'Rayyan06.github.io', // Usually your repo name.
   trailingSlash: false,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -39,24 +39,35 @@ const config = {
       'classic',
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
-        docs: {
-          sidebarPath: './sidebars.js',
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/Rayyan06/Catapult/tree/main/packages/create-docusaurus/templates/shared/',
-        },
+        docs: false,
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/Rayyan06/Catapult/tree/main/packages/create-docusaurus/templates/shared/',
         },
         theme: {
           customCss: './src/css/custom.css',
         },
       }),
+    ],
+  ],
+  plugins: [
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'projects', // Unique ID for projects
+        path: 'projects',
+        routeBasePath: 'projects',
+        sidebarPath: './sidebars.js', // Points to your first sidebar file
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'wiki',
+        path: 'wiki',
+        routeBasePath: 'wiki',
+        sidebarPath: './sidebarWiki.js',
+      },
     ],
   ],
 
@@ -66,7 +77,7 @@ const config = {
       // Replace with your project's social card
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
-        title: 'Catapult',
+        title: 'M.R.K.',
         /*
         logo: {
           alt: 'My Site Logo',
@@ -74,14 +85,25 @@ const config = {
         },*/
         items: [
           {
-            type: 'docSidebar',
-            sidebarId: 'avrSidebar',
+            type: 'dropdown',
             position: 'left',
-            label: 'AVR Programming',
+            label: 'Projects',
+            to: '/projects/overview/',
+            items: [
+              { to: '/projects/foam-cutting-cnc', label: 'Foam Cutting CNC' },
+              { to: '/projects/optical-encoder', label: 'Optical Encoder' },
+            ],
+          },
+          {
+            type: 'doc',
+            docsPluginId: 'wiki',
+            docId: 'intro',
+            position: 'left',
+            label: 'Wiki',
           },
           { to: '/blog', label: 'Blog', position: 'left' },
           {
-            href: 'https://github.com/Rayyan06/AVR-Programming',
+            href: 'https://github.com/Rayyan06/Rayyan06.github.io',
             label: 'GitHub',
             position: 'right',
           },
@@ -91,11 +113,11 @@ const config = {
         style: 'dark',
         links: [
           {
-            title: 'Catapult Docs',
+            title: 'M.R.K. Portfolio',
             items: [
               {
-                label: 'AVR Programming',
-                to: '/docs/avr-programming/overview',
+                label: 'Wiki',
+                to: '/wiki/avr-programming/overview',
               },
             ],
           } /*
@@ -125,18 +147,29 @@ const config = {
                 to: '/blog',
               },
               {
+                label: 'About',
+                to: 'about',
+              },
+              {
                 label: 'GitHub',
                 href: 'https://github.com/Rayyan06/AVR-Programming',
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Catapult Project`,
+        copyright: `Copyright © ${new Date().getFullYear()} Muhammed Rayyan Khan`,
       },
       prism: {
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
       },
+      // announcementBar: {
+      //   id: 'under development',
+      //   content: 'This website is continuously being updated.',
+      //   backgroundColor: '#fafbfc',
+      //   textColor: '#091E42',
+      //   isCloseable: false,
+      // },
     }),
 };
 

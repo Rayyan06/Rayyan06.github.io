@@ -1,0 +1,100 @@
+---
+title: Projects Overview
+sidebar_label: Overview
+sidebar_position: 1
+description: An overview of Muhammed Rayyan Khan's hardware and software engineering projects, including a custom CNC machine and a high-precision optical encoder.
+---
+
+import Admonition from '@theme/Admonition';
+
+export const ProjectCard = ({ title, link, imageUrl, children }) => (
+  <div
+    style={{
+      border: '1px solid #ddd',
+      borderRadius: '8px',
+      padding: '1.5rem',
+      marginBottom: '2rem',
+      boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+      transition: 'transform 0.2s ease-in-out',
+      display: 'flex',
+      flexDirection: 'column',
+    }}
+  >
+    <h2 style={{ marginTop: 0, marginBottom: '1rem', borderBottom: 'none' }}>
+      <a href={link}>{title}</a>
+    </h2>
+    {imageUrl && (
+      <img
+        src={imageUrl}
+        alt={`${title} project image`}
+        style={{
+          borderRadius: '4px',
+          marginBottom: '1rem',
+          maxHeight: '300px',
+          objectFit: 'cover',
+        }}
+      />
+    )}
+    <div>{children}</div>
+    <a
+      href={link}
+      style={{ marginTop: 'auto', paddingTop: '1rem', fontWeight: 'bold' }}
+    >
+      Explore Project &raquo;
+    </a>
+  </div>
+);
+
+# My Projects
+
+Welcome to my project portfolio. This is where I document my passion for the intersection of hardware and software—turning ideas into tangible, functional devices. I believe in meticulous documentation, so you'll find detailed build logs, schematics, code, and lessons learned for each project.
+
+<Admonition type="info" title="On This Page">
+  You'll find a high-level summary of each project. Click on any project card to
+  dive into the complete, step-by-step documentation and see how it was made.
+</Admonition>
+
+---
+
+{/* This is the correct way to add comments inside JSX/MDX */}
+
+<ProjectCard
+  title="4-Axis Foam Cutting CNC"
+  link="./foam-cutting-cnc/intro"
+  imageUrl="https://placehold.co/600x400"
+>
+  A scratch-built, 4-axis hot-wire CNC machine designed for cutting complex
+  shapes out of foam, such as model aircraft wings. The entire project, from the
+  mechanical design and 3D-printed parts to the firmware and control software,
+  was developed from the ground up. **Key Technologies:** **Microcontroller:**
+  ATmega328P with custom Marlin-based firmware **Control System:** GRBL,
+  Universal Gcode Sender (UGS) **Hardware:** NEMA 17 stepper motors, custom
+  3D-printed components **Programming:** C++ (Firmware), Python (G-code scripts)
+</ProjectCard>
+
+<ProjectCard
+  title="High-Precision Optical Encoder"
+  link="./optical-encoder/intro"
+  imageUrl="https://placehold.co/600x400"
+>
+  This project involved designing and building a high-resolution quadrature optical encoder to measure rotational speed and position with high accuracy. It features a custom-designed encoder disk, an infrared emitter/detector pair, and signal conditioning circuitry to produce clean, reliable digital signals.
+
+_ **Key Technologies:**
+_ **Microcontroller:** STM32F103 ("Blue Pill")
+_ **Electronics:** Schmitt trigger for signal debouncing, comparator circuits
+_ **Design:** Custom PCB design (KiCad), laser-cut acrylic
+\_ **Programming:** C (Interrupt-driven pulse counting), Python (Data logging)
+
+  </ProjectCard>
+
+---
+
+## What's Next?
+
+<Admonition type="tip" title="Future Projects & Ideas">
+  I'm always exploring new ideas. Here are a few things currently on my
+  workbench or in the planning stages: * A custom flight controller for a
+  quadcopter.
+</Admonition>
+
+I'm passionate about building and learning. If you have any questions or want to collaborate, feel free to reach out. You can also follow my work on [GitHub](https://github.com/Rayyan06).
