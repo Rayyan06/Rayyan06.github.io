@@ -9,7 +9,7 @@ const projects = [
     imageUrl: 'https://placehold.co/600x400', // Make sure this path is correct!
     description:
       'A 4-axis CNC machine built from scratch to cut intricate wing airfoils and fuselage sections out of foam for RC planes.',
-    linkUrl: '/projects/foam-cutter-cnc',
+    linkUrl: '/projects/foam-cutting-cnc',
   },
   {
     title: '3D Printed Optical Encoder',
