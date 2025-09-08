@@ -1,0 +1,67 @@
+---
+sidebar_label: 'Design & Theory'
+title: 'Design & Theory'
+description: 'A technical deep-dive into the principles of quadrature encoding and the system architecture of the 3D printed optical encoder.'
+---
+
+## The Challenge: Precision Rotary Position Data on a Budget
+
+The objective of this project was to develop a cost-effective, high-resolution alternative to commercially available optical encoders. While commercial units offer high precision, their cost can be a significant barrier for hobbyists and rapid prototyping. By leveraging 3D printing for mechanical components and a custom AVR-based firmware, it's possible to create a highly capable sensor for a fraction of the price.
+
+---
+
+## Core Principle: Sensing Direction with Quadrature Encoding
+
+The fundamental challenge for any rotary encoder is not just counting pulses, but also determining the direction of rotation. This is solved using a technique called **quadrature encoding**.
+
+Instead of one sensor, two infrared (IR) sensors, typically labeled **Channel A** and **Channel B**, are positioned over the encoder disk's tracks. They are intentionally offset so that as the disk spins, the digital pulses they generate are **90 degrees out of phase**.
+
+The microcontroller's firmware constantly monitors the state of both channels. By observing which channel's signal rises first, it can instantly and reliably determine the direction of rotation:
+
+- If **Channel A leads Channel B**, the shaft is spinning clockwise.
+- If **Channel B leads Channel A**, the shaft is spinning counter-clockwise.
+
+The animation below clearly demonstrates this principle in action.
+
+![Encoder GIF](/img/incremental_directional_encoder.gif)
+
+_Animation demonstrating how the offset between Channel A and Channel B allows the system to determine the direction of rotation._
+
+As you can see in the animation, the microcontroller's firmware constantly monitors the state of both channels. By observing which channel's signal rises or falls first, it can instantly and reliably determine the direction of rotation:
+
+- When the disk spins one way, the rising edge of **Channel A leads the rising edge of Channel B**.
+- When the disk spins the other way, **Channel B leads Channel A**.
+
+This two-channel system is the key to providing robust, bidirectional position tracking.
+
+This two-channel system is the key to providing robust, bidirectional position
+tracking.
+
+---
+
+## System Architecture: From Hardware to GUI
+
+The entire system is designed as a modular data acquisition pipeline, moving information from the physical world to a digital interface for analysis.
+
+[Image of a system block diagram]
+
+The data flows through four distinct stages:
+
+1.  **Encoder Hardware:** A 3D printed disk with 72 slots spins between two IR sensors. The physical rotation is translated into raw digital square waves on Channel A and Channel B.
+
+2.  **AVR Microcontroller:** This is the brain of the operation. It uses hardware interrupts tied to the sensor pins. This is critical, as an interrupt-driven design ensures that **no pulse is ever missed**, even at high rotational speeds.
+
+3.  **Data Transmission:** Upon each interrupt (a change in rotation), the firmware captures the new shaft position and a high-resolution timestamp. This data packet is then serialized and transmitted to a computer via USART.
+
+4.  **PC-Side Processing:** A custom GUI application running on a computer receives the serial data via a USB connection. It deserializes the packets and uses the position and time data to plot real-time charts, calculate velocity, and log the information for further analysis.
+
+---
+
+## Key Design Decisions
+
+Several key engineering decisions were made to meet the project's goals:
+
+- **Low Cost:** Using 3D printing for the encoder wheel and enclosure dramatically reduces the bill of materials compared to using machined metal or glass disks.
+- **High Resolution:** The encoder disk was designed with 72 slots, which, when combined with quadrature encoding (reading all four edge transitions of the A and B signals), results in **288 distinct positions** per revolution.
+- **Real-Time Data:** The interrupt-driven firmware provides near-instantaneous feedback. Data is transmitted not only on a fixed timer but also _the moment_ a change in position is detected.
+- **Rich Data Output:** Instead of just sending a position count, the system also sends a `delta T` (timestamp) with each interrupt. This allows the PC-side software to accurately calculate not just position, but also angular velocity and acceleration.

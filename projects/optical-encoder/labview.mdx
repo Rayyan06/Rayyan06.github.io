@@ -1,0 +1,50 @@
+---
+sidebar_label: 'LabVIEW Client GUI'
+title: 'LabVIEW Client: Real-Time Data Acquisition & Visualization'
+description: 'A detailed overview of the LabVIEW application that receives, processes, and displays the real-time data from the optical encoder.'
+---
+
+The client-side application is a critical component of this project, responsible for receiving the raw serial data from the AVR microcontroller and transforming it into meaningful, real-time visualizations. It is built in LabVIEW using the **Producer-Consumer design pattern**, a robust architecture that ensures the application remains responsive and never loses data, even at high data rates.
+
+{/* This is the new, corrected format for a zoomable image with a caption */}
+![Front Panel GUI of the LabVIEW Application](/img/labview_frontpanel.png)
+_The front panel of the LabVIEW client, displaying real-time charts and graphs._
+
+---
+
+## The Producer-Consumer Architecture
+
+The application is split into two independent, parallel loops that communicate through a shared data queue. This design decouples the user interface (UI) events from the time-critical task of reading data from the serial port.
+
+- **The Producer Loop:** Handles all user interface events, such as button clicks. It enqueues a message (a command and its data) to be processed by the other loop.
+- **The Consumer Loop:** Continuously monitors the queue for new messages and executes the corresponding action, such as reading serial data or updating charts.
+
+This separation is the key to a high-performance, responsive application.
+
+---
+
+## Block Diagram Deep Dive
+
+Here is an overview of the key components in the LabVIEW block diagram.
+
+{/* This image will now be zoomable */}
+![Block Diagram of the Producer-Consumer Loops in LabVIEW](/img/labview_code.png)
+_The block diagram showing the parallel Producer (top) and Consumer (bottom) loops._
+
+### 1. The Producer Loop: Event Handling
+
+As seen in the top loop of the block diagram, the Producer's sole responsibility is to handle user interactions within an **Event Structure**. When the "Export To Excel" button is clicked, for example, it simply adds an "Export" message to the queue.
+
+### 2. The Consumer Loop: Serial Data and State Machine
+
+The bottom loop is a state machine that dequeues messages and executes the application's logic. It handles initializing the serial port, reading the custom binary data packets using VISA VIs, and processing the data for display.
+
+---
+
+## Data Flow and Initialization
+
+1.  **Initialization:** On startup, the program initializes the VISA serial port, making sure the termination character is disabled to correctly read the binary data packets.
+2.  **Data Acquisition:** The Consumer loop lives in the "Read Serial" state, constantly pulling data from the microcontroller.
+3.  **User Interaction & State Change:** A user action (like clicking "Export") sends a message that causes the Consumer to switch to the "Export Data" state, write the collected data to a file, and then return to acquiring data.
+
+This robust architecture ensures that data acquisition and user interface commands can be handled in parallel without interfering with each other.

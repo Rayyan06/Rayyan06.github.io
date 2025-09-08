@@ -1,0 +1,227 @@
+---
+sidebar_label: 'Firmware Deep Dive'
+title: 'AVR Firmware: An Interrupt-Driven Approach'
+description: 'A detailed walkthrough of the non-blocking, interrupt-driven C++ firmware that powers the optical encoder.'
+tags: [cpp, avr, embedded, firmware, interrupts]
+---
+
+This document provides a detailed walkthrough of the C++ firmware running on the AVR microcontroller. The core design philosophy is to be **interrupt-driven and non-blocking**. This ensures that the system is highly responsive, never misses an encoder pulse, and can handle data transmission efficiently without interfering with position tracking.
+
+---
+
+## Architectural Overview
+
+The firmware's architecture is built around three key components that work together asynchronously:
+
+1.  **Pin Change Interrupts (`INT0_vect`, `INT1_vect`):** These are the primary data acquisition triggers. They fire instantly whenever an encoder channel changes state, capturing the rotation with perfect timing.
+2.  **A Circular Buffer (`tx_buffer`):** This is the crucial link between data acquisition and data transmission. The pin change ISRs act as "producers," quickly adding new data points to the buffer. This decouples the time-critical task of reading the encoder from the slower task of sending data.
+3.  **The USART "Data Register Empty" Interrupt (`USART_UDRE_vect`):** This ISR acts as the "consumer." It only fires when the USART hardware is ready to accept a new byte, allowing it to send large data packets byte-by-byte in the background without ever blocking the main program loop.
+
+---
+
+### 1. The Interrupt-Driven Core: Capturing Every Pulse
+
+The most critical task is to accurately read the encoder's state. Relying on a polling loop (`while(1)`) is unreliable, as a fast spin could cause the microcontroller to miss pulses. The solution is to use external hardware interrupts.
+
+- `ISR(INT0_vect)` and `ISR(INT1_vect)` are tied directly to the encoder's A and B channel pins.
+- Any change in state (a rising or falling edge) on either pin will immediately pause the main program and execute the corresponding ISR.
+- Inside the ISR, we do the bare minimum to keep it fast:
+  1.  Call `onEncoderInterrupt()` to update the position based on the new pin states.
+  2.  Capture a high-resolution timestamp using `get_current_time()`.
+  3.  Package this data into a `DataPoint` struct.
+  4.  Place the `DataPoint` into the circular buffer.
+  5.  Enable the USART Data Register Empty interrupt (`UDRIE0`) to signal that there is new data ready to be sent.
+
+This design guarantees that even the fastest rotations are captured with precision.
+
+---
+
+### 2. The Non-Blocking Serial Transmission
+
+Sending data over USART can be slow. If we sent the entire data packet inside the pin change ISR, we would risk missing the next encoder pulse. The `USART_UDRE_vect` interrupt solves this problem elegantly.
+
+This ISR is a state machine that sends one byte of a data packet at a time, only when the hardware is ready.
+
+- When `index == 0`, it pulls a complete `DataPoint` from the circular buffer.
+- The `switch` statement then sends one byte of the packet each time the ISR is called (Start Byte, Position High, Position Low, etc.).
+- After the final byte (the checksum) is sent, it resets its state (`index = 0`) and checks the buffer for another `DataPoint`.
+- If the buffer is empty, it disables itself (`UCSR0B &= ~(1 << UDRIE0)`) and waits quietly until a pin change ISR enables it again.
+
+This method allows for robust, background data transmission without ever halting the CPU.
+
+---
+
+### 3. The Custom Data Protocol
+
+To ensure data integrity and simple parsing on the computer side, a custom binary protocol is used for each packet.
+
+| Byte  | Content               | Description                                                           |
+| :---- | :-------------------- | :-------------------------------------------------------------------- |
+| **0** | Start Byte (`0x02`)   | A fixed value to mark the beginning of a packet.                      |
+| **1** | Position (High Byte)  | The most significant 8 bits of the position.                          |
+| **2** | Position (Low Byte)   | The least significant 8 bits of the position.                         |
+| **3** | Timestamp (High Byte) | The most significant 8 bits of the timestamp.                         |
+| **4** | Timestamp (Low Byte)  | The least significant 8 bits of the timestamp.                        |
+| **5** | Overflows (High Byte) | The most significant 8 bits of the timer overflows.                   |
+| **6** | Overflows (Low Byte)  | The least significant 8 bits of the timer overflows.                  |
+| **7** | Checksum              | A simple XOR checksum of all previous data bytes for error detection. |
+
+---
+
+## Full Firmware Source Code
+
+Here is the complete source code for the AVR microcontroller.
+
+```cpp
+/*
+ * Reads data from a quadrature encoder and transmits it over USART.
+ * This firmware is interrupt-driven and non-blocking.
+ */
+
+#include "readEncoder.h"
+#include <stdint.h>
+#include "DataPoint.h"
+#include "Encoder.h"
+#include "circular_buffer.h"
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include "timing.h"
+#include <avr/power.h>
+#include <util/delay.h>
+#include "USART.h"
+
+/* ------------- Global Variables -------------- */
+
+// Initialize our encoder. Volatile is critical for interrupt access.
+volatile Encoder encoder = {(int16_t)0, (uint8_t)0};
+// The circular buffer for decoupling ISRs.
+volatile circular_buffer_t tx_buffer = {
+    .head = 0,
+    .tail = 0,
+    .data = {{0, 0}, {0, 0}, {0, 0}, {0, 0}}};
+
+//  ----------- Interrupt Service Routines ----------- //
+
+// ISR for Encoder Channel A Pin Change
+ISR(INT0_vect)
+{
+    onEncoderInterrupt(&encoder);
+
+    // Get the current timestamp
+    uint32_t timestamp = get_current_time();
+    uint16_t overflows = (timestamp >> 16) & 0xFFFF;
+    // Create a new data point
+    DataPoint datapoint = {encoder.position, (uint16_t)timestamp, overflows};
+
+    // Add the data point to the transmission buffer
+    buffer_write(&tx_buffer, datapoint);
+
+    // Enable the USART Data Register Empty Interrupt to start transmission
+    UCSR0B |= (1 << UDRIE0);
+}
+
+// ISR for Encoder Channel B Pin Change
+ISR(INT1_vect)
+{
+    onEncoderInterrupt(&encoder);
+
+    // Get the current timestamp
+    uint32_t timestamp = get_current_time();
+    uint16_t overflows = (timestamp >> 16) & 0xFFFF;
+    // Create a new data point
+    DataPoint datapoint = {encoder.position, (uint16_t)timestamp, overflows};
+
+    // Add the data point to the transmission buffer
+    buffer_write(&tx_buffer, datapoint);
+
+    // Enable the USART Data Register Empty Interrupt to start transmission
+    UCSR0B |= (1 << UDRIE0);
+}
+
+// USART Data Register Empty Interrupt Service Routine (sends one byte at a time)
+ISR(USART_UDRE_vect)
+{
+    static DataPoint current_data;
+    static uint8_t checksum;
+    static uint8_t index = 0;
+
+    // If we're at the start of a new packet, get it from the buffer.
+    if (index == 0)
+    {
+        // If the buffer is empty, disable this interrupt and return.
+        if (buffer_is_empty(&tx_buffer))
+        {
+            UCSR0B &= ~(1 << UDRIE0);
+            return;
+        }
+        // Read the data point from the buffer.
+        current_data = buffer_get(&tx_buffer);
+    }
+
+    // Compute the checksum at the start of transmission
+    checksum = 0x02;                                          // Start with the Start Byte
+    checksum ^= (uint8_t)((current_data.position >> 8) & 0xFF);  // XOR Position High Byte
+    checksum ^= (uint8_t)(current_data.position & 0xFF);        // XOR Position Low Byte
+    checksum ^= (uint8_t)((current_data.timestamp >> 8) & 0xFF); // XOR Time High Byte
+    checksum ^= (uint8_t)(current_data.timestamp & 0xFF);        // XOR Time Low Byte
+
+    // Send the data packet byte-by-byte using a state machine.
+    switch (index)
+    {
+    case 0: UDR0 = 0x02; break; // Start Byte
+    case 1: UDR0 = (uint8_t)((current_data.position >> 8) & 0xFF); break; // Position High
+    case 2: UDR0 = (uint8_t)(current_data.position & 0xFF); break; // Position Low
+    case 3: UDR0 = (uint8_t)((current_data.timestamp >> 8) & 0xFF); break; // Time High
+    case 4: UDR0 = (uint8_t)(current_data.timestamp & 0xFF); break; // Time Low
+    case 5: UDR0 = (uint8_t)((current_data.overflows >> 8) & 0xFF); break; // Overflows High
+    case 6: UDR0 = (uint8_t)(current_data.overflows & 0xFF); break; // Overflows Low
+    case 7: UDR0 = checksum; break; // Checksum Byte
+    }
+
+    index++;
+    // If we've sent the last byte, reset for the next packet.
+    if(index > 7) {
+        index = 0;
+    }
+}
+
+// USART Receive Complete Interrupt Service Routine
+ISR(USART_RX_vect)
+{
+    char receivedChar = UDR0; // Read received data
+
+    // Allow remote reset of the position counter
+    if (receivedChar == 'R')
+    {
+        encoder.position = 0;
+    }
+}
+
+int main()
+{
+    // --- INITIALIZATION ---
+    ENCODER_PORT |= (1 << ENCODER_A_PIN) | (1 << ENCODER_B_PIN); // Enable pull-ups
+    initUSART();
+    initEncoder();
+    initTimer1();
+    initBuffer(&tx_buffer);
+
+    // Enable RX Complete Interrupt for remote commands
+    UCSR0B |= (1 << RXCIE0);
+
+    sei(); // Enable global interrupts
+
+    // Set clock to full speed
+    clock_prescale_set(clock_div_1);
+
+    // Initialize encoder state
+    encoder.state = readEncoderPinState();
+
+    // The main loop is empty because all work is done in ISRs.
+    while (1)
+    {
+        // CPU can sleep here to save power if needed.
+    }
+    return 0;
+}
+```

@@ -163,6 +163,18 @@ const config = {
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
       },
+
+      // ADD THIS ENTIRE ZOOM CONFIGURATION BLOCK
+      zoom: {
+        selector: '.markdown :not(a) > img',
+        background: {
+          light: 'rgb(255, 255, 255)',
+          dark: 'rgb(50, 50, 50)',
+        },
+        // Optional medium-zoom options
+        // You can refer to https://github.com/francoischalifour/medium-zoom#options
+        config: {},
+      },
       // announcementBar: {
       //   id: 'under development',
       //   content: 'This website is continuously being updated.',
